@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
-#include "autocompleter.h"
+#include "autocompleter.cpp"
 
 using namespace std;
 
