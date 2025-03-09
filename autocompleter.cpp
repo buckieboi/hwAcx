@@ -1,5 +1,3 @@
-#ifndef AUTOCOMPLETER_H
-#define AUTOCOMPLETER_H
 
 #include <vector>
 #include <string>
@@ -37,19 +35,34 @@ void Autocompleter::insert(string x, int freq){
 // Inserts an Entry into an AVL tree rooted at p.
 //
 // Should run in O(log(n)) time.
+
 void Autocompleter::insert_recurse(Entry e, Node* &p);
-//idea: so  insert() calls on insert_recurse take care of job
-// and this will insert entry e into evl tree rooted at p
-//use avl rules ot find where it is like if... will  pick left or right
-if(e < p){
-	p->left = e;
-}
-else{
-	p->right = e;
-}
+    // BC: p == nullptr
+    // create node here, return
 
+    // Do nothing if entry already exists (e.s == p->e.s)
 
+    // Recur on appropriate child (left/right)
 
+    // very end
+	if(p == nullptr){
+		Node* e = new p;
+	}
+	else{
+		return 0;
+	}
+
+	if(e.s < p){
+		insert_recurse(e,p);
+
+	}
+	else{
+
+	}
+
+	//very end
+	rebalance(p);
+	update_height(p);
 
 
 
@@ -85,12 +98,63 @@ int Autocompleter::size_recurse(Node* p);
 // Instead, only search regions of the tree for which a completion could
 // be present, which will yield a run time bound of O(k log n ) time,
 // where k is the number of completions in the tree.
-void Autocompleter::completions(string x, vector<string> &T);
+void Autocompleter::completions(string x, vector<string> &T)
+{
+    T.clear();
+    vector<Entry> C;
+    Entry nulle("", -1);
+    C.push_back(nulle);
+    C.push_back(nulle);
+    C.push_back(nulle);
+    completions_recurse(x, root, C);
+    for (Entry e : C) if (e.freq != -1) T.push_back(e.s);
+}
 
 
 
 // Fills C with the completions of x in the BST rooted at p.
-void Autocompleter::completions_recurse(string x, Node* p, vector<Entry> &C);
+void Autocompleter::completions_recurse(string x, Node* p, vector<Entry> &C)
+{
+    if (p == nullptr) return;
+
+    string pfx = p->e.s.substr(0, x.length());
+
+    if (x == pfx)
+    {
+        Entry eTemp1 = p->e, eTemp2 = p->e;
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (C[i].freq <= eTemp1.freq)
+            {
+                switch (i)
+                {
+                case 0:
+                {
+                    eTemp2 = C[0];
+                    C[0] = eTemp1;
+                    break;
+                }
+                case 1:
+                {
+                    eTemp1 = C[1];
+                    C[1] = eTemp2;
+                    break;
+                }
+                case 2:
+                {
+                    C[2] = eTemp1;
+                    break;
+                }
+                }
+            }
+        }
+        completions_recurse(x, p->left, C);
+        completions_recurse(x, p->right, C);
+    }
+    else if (x < pfx) completions_recurse(x, p->left, C);
+	else completions_recurse(x,p->right, C);
+}
 
 
 
